@@ -15,7 +15,7 @@ function deleteStructureType($id){
 
 function generateId($table_name){
     $conn = DBConnection::getInstance();
-    $query ="SELECT COLUMN_NAME,DATA_TYPE,CHARACTER_MAXIMUM_LENGTH FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = 'structure_object' and COLUMN_KEY = 'PRI';";
+    $query ="SELECT COLUMN_NAME,DATA_TYPE,CHARACTER_MAXIMUM_LENGTH FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = $table_name and COLUMN_KEY = 'PRI';";
     $id = $conn->performQueryFetch($query);
     do {
         switch($id['DATA_TYPE']){
