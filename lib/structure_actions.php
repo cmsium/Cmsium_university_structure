@@ -9,7 +9,6 @@ function addType(){
         echo json_encode(['status'=>'error', 'message'=>'Validation error','fields'=>implode(',',$validator->getErrors())]);
         exit;
     }
-    var_dump($_POST);
     if (!addStructureType($data['type_name']))
         echo json_encode(['status'=>'error', 'message'=>'Create type error']);
     else
