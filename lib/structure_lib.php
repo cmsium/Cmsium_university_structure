@@ -31,7 +31,7 @@ function generateId($table_name){
 
 function randomString($length, $string = 'abcdef0123456789'){
     $result='';
-    for($i=0;$i<=$length;$i++){
+    for($i=0;$i<$length;$i++){
         $result .= $string[mt_rand(0,strlen($string) - 1)];
     }
     return $result;
