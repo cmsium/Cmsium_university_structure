@@ -42,7 +42,6 @@ function addStructureObject($data){
     $conn = DBConnection::getInstance();
     $id = generateId('structure_object');
     $query = "INSERT INTO structure_object (obj_id,obj_name,type_id,parent_id) VALUES ('$id','{$data['obj_name']}','{$data['type_id']}','{$data['parent_id']}');";
-    var_dump($query);
     return $conn->performQuery($query);
 }
 
