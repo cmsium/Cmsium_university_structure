@@ -9,8 +9,11 @@ function addType(){
         echo json_encode(['status'=>'error', 'message'=>'Validation error','fields'=>implode(',',$validator->getErrors())]);
         exit;
     }
-    addStructureType($data['type_name']);
-    echo json_encode(['status'=>'ok', 'message'=>'Create type success']);
+    var_dump($_POST);
+    if (!addStructureType($data['type_name']))
+        echo json_encode(['status'=>'error', 'message'=>'Create type error']);
+    else
+        echo json_encode(['status'=>'ok', 'message'=>'Create type success']);
 }
 
 function deleteType(){
