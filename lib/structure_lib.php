@@ -3,19 +3,19 @@
 
 function addStructureType($name){
     $conn = DBConnection::getInstance();
-    $query = "INSERT INTO structure_types (type_name) VALUES ('$name');";
+    $query = "call addStructureType('$name');";
     return $conn->performQuery($query);
 }
 
 function deleteStructureType($id){
     $conn = DBConnection::getInstance();
-    $query = "DELETE FROM structure_types WHERE type_id='$id';";
+    $query = "call deleteStructureType('$id');";
     return $conn->performQuery($query);
 }
 
 function generateId($table_name){
     $conn = DBConnection::getInstance();
-    $query ="SELECT COLUMN_NAME,DATA_TYPE,CHARACTER_MAXIMUM_LENGTH FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '$table_name' and COLUMN_KEY = 'PRI';";
+    $query ="call getTableStructureData('$table_name')";
     $id = $conn->performQueryFetch($query);
     do {
         switch($id['DATA_TYPE']){
@@ -41,24 +41,21 @@ function randomString($length, $string = 'abcdef0123456789'){
 function addStructureObject($data){
     $conn = DBConnection::getInstance();
     $id = generateId('structure_object');
-    $query = "INSERT INTO structure_object (obj_id,obj_name,type_id,parent_id) VALUES ('$id','{$data['obj_name']}','{$data['type_id']}','{$data['parent_id']}');";
+    $query = "call addStructureObject('$id','{$data['obj_name']}','{$data['type_id']}','{$data['parent_id']}');";
     return $conn->performQuery($query);
 }
 
 
 function deleteStructureObject($id){
     $conn = DBConnection::getInstance();
-    $query = "DELETE FROM structure_object WHERE obj_id='$id'";
+    $query = "call deleteStructureObject('$id')";
     return $conn->performQuery($query);
 }
 
 
 function getStructureObject($id){
     $conn = DBConnection::getInstance();
-    $query = "SELECT obj.obj_id, obj.obj_name, obj.type_id, types.type_name, obj.parent_id, p_obj.obj_name as parent_name FROM structure_object AS obj 
-              JOIN structure_types AS types ON obj.type_id = types.type_id
-              JOIN structure_object AS p_obj ON obj.parent_id = p_obj.obj_id 
-              WHERE obj.obj_id = '$id'";
+    $query = "call getStructureObject('$id');";
     return $conn->performQueryFetch($query);
 }
 
@@ -73,10 +70,7 @@ function getStructureObjectsByFilter($search_data,$start,$limit){
     else
         $search_str = "WHERE ".implode(' AND ',$search_arr);
     $conn = DBConnection::getInstance();
-    $query = "SELECT SQL_CALC_FOUND_ROWS obj.obj_id, obj.obj_name, obj.type_id, types.type_name,p_obj.obj_name as parent_name FROM structure_object AS obj 
-              JOIN structure_types AS types ON obj.type_id = types.type_id
-              JOIN structure_object AS p_obj ON obj.parent_id = p_obj.obj_id $search_str 
-              LIMIT $start,$limit;";
+    $query = "call getStructureObjectsByFilter('$search_str', '$start','$limit';";
     $objects = $conn->performQueryFetchAll($query);
     if (!$objects)
         $objects = [];
@@ -99,12 +93,12 @@ function updateStructureObject($data){
         return true;
     }
     $conn = DBConnection::getInstance();
-    $query = "UPDATE structure_object SET $update_str WHERE obj_id = '$id'";
+    $query = "call updateStructureObject('$update_str','$id')";
     return $conn->performQuery($query);
 }
 
 function getStructureTypes(){
     $conn = DBConnection::getInstance();
-    $query = "SELECT * FROM structure_types;";
+    $query = "call getStructureTypes();";
     return $conn->performQueryFetchALL($query);
 }
