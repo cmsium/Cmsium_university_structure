@@ -6,13 +6,12 @@ function addType(){
     $validator = Validator::getInstance();
     $data = $validator->validateAllByMask($_POST,'addStructureTypeMask');
     if ($data === false){
-        echo json_encode(['status'=>'error', 'message'=>'Validation error','fields'=>implode(',',$validator->getErrors())]);
-        exit;
+        throwException(DATA_FORMAT_ERROR);
     }
-    if (!addStructureType($data['type_name']))
-        echo json_encode(['status'=>'error', 'message'=>'Create type error']);
-    else
-        echo json_encode(['status'=>'ok', 'message'=>'Create type success']);
+    if (!addStructureType($data['type_name'])) {
+        throwException(CREATE_STRUCTURE_TYPE_ERROR);
+    }
+
 }
 
 function deleteType(){
@@ -20,11 +19,11 @@ function deleteType(){
     $validator = Validator::getInstance();
     $data = $validator->validateAllByMask($_GET,'deleteStructureTypeMask');
     if ($data === false){
-        echo json_encode(['status'=>'error', 'message'=>'Validation error','fields'=>implode(',',$validator->getErrors())]);
-        exit;
+        throwException(DATA_FORMAT_ERROR);
     }
-    deleteStructureType($data['id']);
-    echo json_encode(['status'=>'ok', 'message'=>'Delete type success']);
+    if (!deleteStructureType($data['id'])) {
+        throwException(DELETE_STRUCTURE_TYPE_ERROR);
+    }
 }
 
 function addObject(){
@@ -32,14 +31,11 @@ function addObject(){
     $validator = Validator::getInstance();
     $data = $validator->validateAllByMask($_GET,'addStructureObjectMask');
     if ($data === false){
-        echo json_encode(['status'=>'error', 'message'=>'Validation error','fields'=>implode(',',$validator->getErrors())]);
-        exit;
+        throwException(DATA_FORMAT_ERROR);
     }
     if (!addStructureObject($data)){
-        echo json_encode(['status'=>'error', 'message'=>'Database error']);
-        exit;
+        throwException(ADD_STRUCTURE_OBJECT_ERROR);
     }
-    echo json_encode(['status'=>'ok', 'message'=>'Create structure node success']);
 }
 
 function updateObject(){
@@ -47,15 +43,10 @@ function updateObject(){
     $validator = Validator::getInstance();
     $data = $validator->validateAllByMask($_POST,'updateStructureObjectMask');
     if ($data === false){
-        echo json_encode(['status'=>'error', 'message'=>'Validation error','fields'=>implode(',',$validator->getErrors())]);
-        exit;
+        throwException(DATA_FORMAT_ERROR);
     }
     if (updateStructureObject($data) === false){
-        echo json_encode(['status'=>'error', 'message'=>'Update error']);
-        exit;
-    } else {
-        echo json_encode(['status'=>'ok', 'message'=>'update Success']);
-        exit;
+        throwException(UPDATE_STRUCTURE_OBJECT_ERROR);
     }
 }
 
@@ -64,14 +55,11 @@ function deleteObject(){
     $validator = Validator::getInstance();
     $data = $validator->validateAllByMask($_GET,'deleteStructureObjectMask');
     if ($data === false){
-        echo json_encode(['status'=>'error', 'message'=>'Validation error','fields'=>implode(',',$validator->getErrors())]);
-        exit;
+        throwException(DATA_FORMAT_ERROR);
     }
     if (!deleteStructureObject($data['obj_id'])){
-        echo json_encode(['status'=>'error', 'message'=>'Database error']);
-        exit;
+        throwException(DELETE_STRUCTURE_OBJECT_ERROR);
     }
-    echo json_encode(['status'=>'ok', 'message'=>'Delete structure node success']);
 }
 
 
@@ -80,14 +68,14 @@ function getObject(){
     $validator = Validator::getInstance();
     $data = $validator->validateAllByMask($_GET,'getStructureObjectMask');
     if ($data === false){
-        echo json_encode(['status'=>'error', 'message'=>'Validation error','fields'=>implode(',',$validator->getErrors())]);
-        exit;
+        throwException(DATA_FORMAT_ERROR);
     }
     $obj = getStructureObject($data['obj_id']);
     if ($obj){
-        echo json_encode(array_merge(['status'=>'ok'],$obj));
+        //TODO send enumerative array, not json
+        echo json_encode($obj);
     } else {
-        echo json_encode(['status'=>'error']);
+        throwException(GET_STRUCTURE_OBJECT_ERROR);
     }
 }
 
@@ -96,8 +84,7 @@ function getObjects(){
     $validator = Validator::getInstance();
     $data = $validator->validateAllByMask($_GET,'getStructureObjectsMask');
     if ($data === false){
-        echo json_encode(['status'=>'error', 'message'=>'Validation error','fields'=>implode(',',$validator->getErrors())]);
-        exit;
+        throwException(DATA_FORMAT_ERROR);
     }
     if (isset($data['start'])) {
         $start = $data['start'];
@@ -112,15 +99,17 @@ function getObjects(){
         $limit = 1000000;
     }
     $objects = getStructureObjectsByFilter($data,$start,$limit);
-    echo json_encode(array_merge(['status'=>'ok'],$objects));
+    //TODO send enumerative array, not json
+    echo json_encode($objects);
 }
 
 function getTypes(){
     checkAuth();
     $types = getStructureTypes();
     if ($types){
-        echo json_encode(array_merge(['status'=>'ok'],$types));
+        //TODO send enumerative array, not json
+        echo json_encode($types);
     } else {
-        echo json_encode(['status'=>'error']);
+        throwException(GET_STRUCTURE_TYPE_ERROR);
     }
 }
