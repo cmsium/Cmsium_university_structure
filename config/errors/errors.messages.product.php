@@ -6,7 +6,7 @@ define ("DELETE_STRUCTURE_TYPE_ERROR",['code' => 702, 'text' => 'Ошибка у
 define ("DELETE_STRUCTURE_TYPE_SUCCESS",['code' => 703, 'text' => 'Тип успешно удалён']);
 define ("ADD_STRUCTURE_OBJECT_ERROR",['code' => 704, 'text' => 'Ошибка добавления объекта']);
 define ("ADD_STRUCTURE_OBJECT_SUCCESS",['code' => 705, 'text' => 'Объект успешно добавлен']);
-define ("UPDATE_STRUCTURE_OBJECT_ERROR",['code' => 706, 'text' => 'Ошибка добавления объекта']);
+define ("UPDATE_STRUCTURE_OBJECT_ERROR",['code' => 706, 'text' => 'Ошибка обновления объекта']);
 define ("UPDATE_STRUCTURE_OBJECT_SUCCESS",['code' => 707, 'text' => 'Объект успешно добавлен']);
 define ("DELETE_STRUCTURE_OBJECT_ERROR",['code' => 708, 'text' => 'Ошибка удаления объекта']);
 define ("DELETE_STRUCTURE_OBJECT_SUCCESS",['code' => 709, 'text' => 'Объект успешно удалён']);
