@@ -9,3 +9,4 @@ require_once ROOTDIR . '/lib/structure_actions.php';
 require_once ROOTDIR . '/lib/structure_lib.php';
 require_once ROOTDIR.'/lib/connection.php';
 require_once ROOTDIR.'/lib/HeadersController.php';
+require_once ROOTDIR.'/config/errors/errors.messages.debug.php';

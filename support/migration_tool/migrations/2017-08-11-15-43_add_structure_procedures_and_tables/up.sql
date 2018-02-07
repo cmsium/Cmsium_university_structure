@@ -59,10 +59,10 @@ CREATE PROCEDURE getStructureObjectsByFilter(IN queryWhere VARCHAR(255), IN inSt
     COMMIT;
   END;
 
-CREATE PROCEDURE updateStructureObject(IN updateStr VARCHAR(255),IN idObj VARCHAR(5))
+CREATE PROCEDURE updateStructureObject(IN updateStr VARCHAR(255), IN idObj VARCHAR(5))
   BEGIN
     START TRANSACTION;
-    SET @sql = CONCAT('UPDATE structure_object SET ',updateStr,' WHERE obj_id = ',idObj,';');
+    SET @sql = CONCAT('UPDATE structure_object SET ',updateStr,' WHERE obj_id = "',idObj,'";');
     PREPARE stmt FROM @sql;
     EXECUTE stmt;
     DEALLOCATE PREPARE stmt;

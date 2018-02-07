@@ -19,5 +19,5 @@ $params = array_values($params);
 header('Access-Control-Allow-Origin: *');
 ob_start();
 @$action(...$params);
-ob_flush()
+ob_flush();
 ?>

@@ -1,19 +1,29 @@
 <?php
 function sendRequest($URL,$method,$header,$content){
-    $options = ['http' => ['method' => $method, 'header' => $header, 'content' => $content]];
+    $options = ['http' => ['method' => $method, 'header' => $header]];
+    if ($content) {
+        $options['http']['content'] = $content;
+    }
     $context = stream_context_create($options);
-    return json_decode(file_get_contents("http://$URL", false, $context),true);
+    $result = file_get_contents("http://$URL", false, $context);
+    if ($code = getHeaderValue($http_response_header, 'App-Exception')) {
+        throwExceptionByCode($code);
+    }
+    return $result;
 }
 
-function sendFile($URL,$file_path){
-    $mime = mime_content_type($file_path);
-    $server = "http://$URL";
-    $curl = curl_init($server);
-    curl_setopt($curl, CURLOPT_POST, true);
-    $data = ['userfile' => curl_file_create($file_path,$mime,basename($file_path))];
-    curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-    return json_decode(curl_exec($curl),true);
+function sendRequestJSON($URL,$method,$header,$content,$json_mask = null){
+    $options = ['http' => ['method' => $method, 'header' => $header, 'content' => $content]];
+    $context = stream_context_create($options);
+    $content = file_get_contents("http://$URL", false, $context);
+    if ($code = getHeaderValue($http_response_header, 'App-Exception')) {
+        throwExceptionByCode($code);
+    }
+    if ($json_mask){
+        return array_combine($json_mask,json_decode($content, false));
+    } else {
+        return json_decode($content, true);
+    }
 }
 
 function checkAuth(){
@@ -45,6 +55,23 @@ function checkAuth(){
 
 function throwException (array $exception){
     header("App-Exception: {$exception['code']}");
+    var_dump($exception);
     ob_clean();
     exit();
+}
+
+function throwExceptionByCode ($code){
+    header("App-Exception: ".(int)$code);
+    ob_clean();
+    exit();
+}
+
+function getHeaderValue($headers_array, $header) {
+    foreach ($headers_array as $value) {
+        $parsed_array = explode(':', $value, 2);
+        if ($parsed_array[0] === $header) {
+            return trim($parsed_array[1]);
+        }
+    }
+    return false;
 }
