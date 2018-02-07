@@ -56,7 +56,7 @@ function checkAuth(){
 function throwException (array $exception){
     header("App-Exception: {$exception['code']}");
     var_dump($exception);
-    //ob_clean();
+    ob_clean();
     exit();
 }
 
