@@ -93,7 +93,6 @@ function updateStructureObject($data){
         return true;
     }
     $conn = DBConnection::getInstance();
-    var_dump("call updateStructureObject('$update_str','$id')");
     $query = "call updateStructureObject('$update_str','$id')";
     return $conn->performQuery($query);
 }

@@ -41,7 +41,7 @@ function addObject(){
 function updateObject(){
     checkAuth();
     $validator = Validator::getInstance();
-    $data = $validator->validateAllByMask($_GET,'updateStructureObjectMask');
+    $data = $validator->validateAllByMask($_POST,'updateStructureObjectMask');
     if ($data === false){
         throwException(DATA_FORMAT_ERROR);
     }
