@@ -37,20 +37,32 @@ class Masks{
                 'func' => 'CirrLatName',
                 'props' => ['min' => 1, 'max' => 255],
                 'required' => true],
+            'table' => [
+                'func' => 'ValueFromList',
+                'props' => ['list'=>['logic','structure']],
+                'required' => false],
         ],
 
         'deleteStructureTypeMask'=>[
             'id' => [
-                'func' => 'StrNumbers',
-                'props' => ['min'=>0,'max' => 3],
+                'func' => 'CirrLatName',
+                'props' => ['min'=>1,'max' => 3],
                 'required' => true],
+            'table' => [
+                'func' => 'ValueFromList',
+                'props' => ['list'=>['logic','structure']],
+                'required' => false],
         ],
 
         'getStructureObjectMask'=>[
             'obj_id' => [
-                'func' => 'hash',
-                'props' => ['max' => 5],
+                'func' => 'CirrLatName',
+                'props' => ['min'=>1,'max' => 5],
                 'required' => true],
+            'table' => [
+                'func' => 'ValueFromList',
+                'props' => ['list'=>['logic','structure']],
+                'required' => false],
         ],
 
         'getStructureObjectsMask'=>[
@@ -59,12 +71,16 @@ class Masks{
                 'props' => ['min' => 1, 'max' => 255],
                 'required' => false],
             'type_id' => [
-                'func' => 'StrNumbers',
+                'func' => 'CirrLatName',
                 'props' => ['min' => 1, 'max' => 3],
                 'required' => false],
             'parent_id' => [
-                'func' => 'hash',
-                'props' => ['max' => 5],
+                'func' => 'CirrLatName',
+                'props' => ['min' => 1,'max' => 5],
+                'required' => false],
+            'table' => [
+                'func' => 'ValueFromList',
+                'props' => ['list'=>['logic','structure']],
                 'required' => false],
             'start' => [
                 'func' => 'StrNumbers',
@@ -85,40 +101,85 @@ class Masks{
                 'props' => ['min' => 1, 'max' => 255],
                 'required' => true],
             'type_id' => [
-                'func' => 'StrNumbers',
+                'func' => 'CirrLatName',
                 'props' => ['min' => 1, 'max' => 3],
                 'required' => true],
             'parent_id' => [
-                'func' => 'hash',
-                'props' => ['max' => 5],
+                'func' => 'CirrLatName',
+                'props' => ['min' => 1,'max' => 5],
                 'required' => true],
+            'table' => [
+                'func' => 'ValueFromList',
+                'props' => ['list'=>['logic','structure']],
+                'required' => false],
+        ],
+
+        'addToStructureMask'=>[
+            'obj_id' => [
+                'func' => 'CirrLatName',
+                'props' => ['min' => 1, 'max' => 5],
+                'required' => true],
+            'entity_type' => [
+                'func' => 'ValueFromList',
+                'props' => ['list' => ['structure','role','user']],
+                'required' => true],
+            'entity_id' => [
+                'func' => 'CirrLatName',
+                'props' => ['min' => 1,'max' => 32],
+                'required' => true],
+        ],
+
+        'showObjectMask'=>[
+            'obj_id' => [
+                'func' => 'CirrLatName',
+                'props' => ['min' => 1, 'max' => 5],
+                'required' => true],
+            'table' => [
+                'func' => 'ValueFromList',
+                'props' => ['list'=>['logic','structure']],
+                'required' => false],
         ],
 
         'updateStructureObjectMask'=>[
             'obj_id' => [
-                'func' => 'hash',
-                'props' => ['max' => 5],
+                'func' => 'CirrLatName',
+                'props' => ['min' => 1,'max' => 5],
                 'required' => true],
             'obj_name' => [
                 'func' => 'CirrLatName',
                 'props' => ['min' => 1, 'max' => 255],
                 'required' => false],
             'type_id' => [
-                'func' => 'StrNumbers',
+                'func' => 'CirrLatName',
                 'props' => ['min' => 1, 'max' => 3],
                 'required' => false],
             'parent_id' => [
-                'func' => 'hash',
-                'props' => ['max' => 5],
+                'func' => 'CirrLatName',
+                'props' => ['min' => 1,'max' => 5],
+                'required' => false],
+            'table' => [
+                'func' => 'ValueFromList',
+                'props' => ['list'=>['logic','structure']],
                 'required' => false],
         ],
 
         'deleteStructureObjectMask'=>[
             'obj_id' => [
-                'func' => 'hash',
-                'props' => ['max' => 5],
+                'func' => 'CirrLatName',
+                'props' => ['min' => 1,'max' => 5],
                 'required' => true],
+            'table' => [
+                'func' => 'ValueFromList',
+                'props' => ['list'=>['logic','structure']],
+                'required' => false],
         ],
+
+     'getTypesMask'=>[
+         'table' => [
+             'func' => 'ValueFromList',
+             'props' => ['list'=>['logic','structure']],
+             'required' => true],
+         ],
 
     'registMask' => [
         'username' => ['func' => 'CirrLatName',

@@ -3,41 +3,39 @@ create table structure_object
   obj_id varchar(5) not null
     primary key,
   obj_name varchar(255) not null,
-  type_id int(3) not null,
+  type_id VARCHAR(3) not null,
   parent_id varchar(5) not null
 );
 
 create table structure_types
 (
-	type_id int(3) auto_increment
+	type_id VARCHAR(3)
 		primary key,
 	type_name varchar(255) not null
 );
 
-CREATE PROCEDURE addStructureType(IN typeName VARCHAR(255))
-  BEGIN
-    INSERT INTO structure_types (type_name) VALUES (typeName);
-  END;
+CREATE TABLE logic_object
+(
+  obj_id    VARCHAR(5)   NOT NULL
+    PRIMARY KEY,
+  obj_name  VARCHAR(255) NOT NULL,
+  type_id   VARCHAR(3)       NOT NULL,
+  parent_id VARCHAR(5)   NOT NULL
+);
 
-CREATE PROCEDURE deleteStructureType(IN idType INT(3))
-  BEGIN
-    DELETE FROM structure_types WHERE type_id=idType;
-  END;
+CREATE TABLE logic_types
+(
+  type_id   VARCHAR(3)
+    PRIMARY KEY,
+  type_name VARCHAR(255) NOT NULL
+);
+
 
 CREATE PROCEDURE getTableStructureData(IN tableName VARCHAR(255))
   BEGIN
-    SELECT COLUMN_NAME,DATA_TYPE,CHARACTER_MAXIMUM_LENGTH FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = tableName and COLUMN_KEY = 'PRI';
+    SELECT COLUMN_NAME,DATA_TYPE,CHARACTER_MAXIMUM_LENGTH,COLUMN_KEY FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = tableName;
   END;
 
-CREATE PROCEDURE addStructureObject(IN idObj VARCHAR(5),IN nameObj VARCHAR(255),IN idType INT(3),IN idParent VARCHAR(5))
-  BEGIN
-    INSERT INTO structure_object (obj_id,obj_name,type_id,parent_id) VALUES (idObj, nameObj, idType, idParent);
-  END;
-
-CREATE PROCEDURE deleteStructureObject(IN idObj VARCHAR(5))
-  BEGIN
-    DELETE FROM structure_object WHERE obj_id=idObj;
-  END;
 
 CREATE PROCEDURE getStructureObject(IN idObj VARCHAR(5))
   BEGIN
@@ -59,17 +57,24 @@ CREATE PROCEDURE getStructureObjectsByFilter(IN queryWhere VARCHAR(255), IN inSt
     COMMIT;
   END;
 
-CREATE PROCEDURE updateStructureObject(IN updateStr VARCHAR(255), IN idObj VARCHAR(5))
+  CREATE PROCEDURE addDataToEntity(IN tableName       VARCHAR(255), IN insertNamesStr VARCHAR(255),
+                                 IN insertValuesStr VARCHAR(255))
   BEGIN
     START TRANSACTION;
-    SET @sql = CONCAT('UPDATE structure_object SET ',updateStr,' WHERE obj_id = "',idObj,'";');
+    SET @sql = CONCAT('INSERT INTO ',tableName,' (',insertNamesStr,') VALUES (',insertValuesStr,');');
     PREPARE stmt FROM @sql;
     EXECUTE stmt;
     DEALLOCATE PREPARE stmt;
     COMMIT;
   END;
 
-CREATE PROCEDURE getStructureTypes()
+  CREATE PROCEDURE getAllEntities(IN tableName VARCHAR(255), IN queryWhere VARCHAR(255), IN inStart INT(6),
+                                IN inOffset  INT(6))
   BEGIN
-    SELECT * FROM structure_types;
+    START TRANSACTION;
+    SET @sql = CONCAT('SELECT SQL_CALC_FOUND_ROWS * FROM ',tableName,' ',queryWhere,' LIMIT ',inStart,',',inOffset,';');
+    PREPARE stmt FROM @sql;
+    EXECUTE stmt;
+    DEALLOCATE PREPARE stmt;
+    COMMIT;
   END;

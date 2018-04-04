@@ -13,21 +13,21 @@ function deleteStructureType($id){
     return $conn->performQuery($query);
 }
 
-function generateId($table_name){
-    $conn = DBConnection::getInstance();
-    $query ="call getTableStructureData('$table_name')";
-    $id = $conn->performQueryFetch($query);
-    do {
-        switch($id['DATA_TYPE']){
-            case 'varchar':
-                $generated_id = randomString($id['CHARACTER_MAXIMUM_LENGTH']);
-                break;
-        }
-        $query = "SELECT * FROM $table_name WHERE {$id['COLUMN_NAME']} = '$generated_id';";
-        $result = $conn->performQueryFetch($query);
-    } while (!empty($result));
-    return $generated_id;
-}
+//function generateId($table_name){
+//    $conn = DBConnection::getInstance();
+//    $query ="call getTableStructureData('$table_name')";
+//    $id = $conn->performQueryFetch($query);
+//    do {
+//        switch($id['DATA_TYPE']){
+//            case 'varchar':
+//                $generated_id = randomString($id['CHARACTER_MAXIMUM_LENGTH']);
+//                break;
+//        }
+//        $query = "SELECT * FROM $table_name WHERE {$id['COLUMN_NAME']} = '$generated_id';";
+//        $result = $conn->performQueryFetch($query);
+//    } while (!empty($result));
+//    return $generated_id;
+//}
 
 function randomString($length, $string = 'abcdef0123456789'){
     $result='';
