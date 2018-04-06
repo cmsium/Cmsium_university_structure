@@ -129,6 +129,17 @@ class Masks{
                 'required' => true],
         ],
 
+        'showObjectNodesMask'=>[
+            'logic_obj_id' => [
+                'func' => 'CirrLatName',
+                'props' => ['min' => 1, 'max' => 5],
+                'required' => true],
+            'table' => [
+                'func' => 'ValueFromList',
+                'props' => ['list'=>['user','role','structure']],
+                'required' => false],
+        ],
+
         'showObjectMask'=>[
             'obj_id' => [
                 'func' => 'CirrLatName',

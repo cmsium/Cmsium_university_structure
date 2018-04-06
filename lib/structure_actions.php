@@ -159,10 +159,23 @@ function showObject(){
         throwException(DATA_FORMAT_ERROR);
     }
     $obj_handler = new DataModel($data['table'].'_object');
-    if (!($result = $obj_handler->read($data['obj_id']))){
+    if (!($result = $obj_handler->read($data['obj_id'],['fkeys'=>['type_id'=>$data['table'].'_types']]))){
         throwException(DELETE_STRUCTURE_OBJECT_ERROR);
     }
-    var_dump($result);
+    echo json_encode($result);
+}
+
+function showObjectChildNodes(){
+    checkAuth();
+    $validator = Validator::getInstance();
+    $data = $validator->validateAllByMask($_GET,'showObjectNodesMask');
+    if ($data === false){
+        throwException(DATA_FORMAT_ERROR);
+    }
+    $obj_handler = new NPDataModel($data['table'].'_in_logic');
+    unset($data['table']);
+    $result = $obj_handler->read($data);
+    echo json_encode($result);
 }
 
 function addToStructure(){
