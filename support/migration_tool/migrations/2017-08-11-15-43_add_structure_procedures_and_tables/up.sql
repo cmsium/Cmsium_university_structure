@@ -30,6 +30,29 @@ CREATE TABLE logic_types
   type_name VARCHAR(255) NOT NULL
 );
 
+create table structure_in_logic
+(
+  logic_obj_id varchar(5) not null,
+  structure_id varchar(5) not null,
+  constraint structure_in_logic_logic_obj_id_uindex
+  unique (logic_obj_id, structure_id)
+);
+
+create table role_in_logic
+(
+  logic_obj_id varchar(5) not null,
+  role_id      int        not null,
+  constraint role_in_logic_logic_obj_id_uindex
+  unique (logic_obj_id, role_id)
+);
+
+create table user_in_logic
+(
+  logic_obj_id varchar(5)  not null,
+  user_id      varchar(32) not null,
+  constraint user_in_logic_logic_obj_id_uindex
+  unique (logic_obj_id, user_id)
+);
 
 CREATE PROCEDURE getTableStructureData(IN tableName VARCHAR(255))
   BEGIN

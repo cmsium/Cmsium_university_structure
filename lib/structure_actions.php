@@ -160,7 +160,7 @@ function showObject(){
     }
     $obj_handler = new DataModel($data['table'].'_object');
     if (!($result = $obj_handler->read($data['obj_id'],['fkeys'=>['type_id'=>$data['table'].'_types']]))){
-        throwException(DELETE_STRUCTURE_OBJECT_ERROR);
+        throwException(GET_STRUCTURE_OBJECT_ERROR);
     }
     echo json_encode($result);
 }
