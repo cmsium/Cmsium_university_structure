@@ -121,11 +121,78 @@ class Masks{
                 'required' => true],
             'entity_type' => [
                 'func' => 'ValueFromList',
-                'props' => ['list' => ['structure','role','user']],
+                'props' => ['list' => ['structure','position']],
                 'required' => true],
             'entity_id' => [
                 'func' => 'CirrLatName',
                 'props' => ['min' => 1,'max' => 32],
+                'required' => true],
+        ],
+
+        'addPositionMask'=>[
+            'position_name' => [
+                'func' => 'CirrLatName',
+                'props' => ['min' => 1, 'max' => 255],
+                'required' => true],
+        ],
+
+        'addWorkplaceMask'=>[
+            'structure_id' => [
+                'func' => 'CirrLatName',
+                'props' => ['min' => 1, 'max' => 5],
+                'required' => true],
+            'position_id' => [
+                'func' => 'CirrLatName',
+                'props' => ['min' => 1, 'max' => 3],
+                'required' => true],
+        ],
+
+        'getWorkplacesMask'=>[
+            'structure_id' => [
+                'func' => 'CirrLatName',
+                'props' => ['min' => 1, 'max' => 5],
+                'required' => false],
+            'position_id' => [
+                'func' => 'CirrLatName',
+                'props' => ['min' => 1, 'max' => 3],
+                'required' => false],
+            'start' => [
+                'func' => 'StrNumbers',
+                'props' => ['min' => 1,'max' => 10, 'output' => 'int'],
+                'required' => false
+            ],
+            'limit' => [
+                'func' => 'StrNumbers',
+                'props' => ['min' => 1,'max' => 10],
+                'required' => false
+            ],
+        ],
+
+        'showWorkplaceMask'=>[
+            'workplace_id' => [
+                'func' => 'CirrLatName',
+                'props' => ['min' => 1, 'max' => 6],
+                'required' => true],
+        ],
+
+        'deleteWorkplaceMask'=>[
+            'workplace_id' => [
+                'func' => 'CirrLatName',
+                'props' => ['min' => 1, 'max' => 6],
+                'required' => true],
+        ],
+
+        'deletePositionMask'=>[
+            'position_id' => [
+                'func' => 'CirrLatName',
+                'props' => ['min' => 1, 'max' => 3],
+                'required' => true],
+        ],
+
+        'showPositionMask'=>[
+            'position_id' => [
+                'func' => 'CirrLatName',
+                'props' => ['min' => 1, 'max' => 3],
                 'required' => true],
         ],
 
@@ -136,7 +203,7 @@ class Masks{
                 'required' => true],
             'table' => [
                 'func' => 'ValueFromList',
-                'props' => ['list'=>['user','role','structure']],
+                'props' => ['list'=>['position','structure']],
                 'required' => false],
         ],
 

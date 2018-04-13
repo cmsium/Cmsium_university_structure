@@ -38,20 +38,19 @@ create table structure_in_logic
   unique (logic_obj_id, structure_id)
 );
 
-create table role_in_logic
+create table positions
 (
-  logic_obj_id varchar(5) not null,
-  role_id      int        not null,
-  constraint role_in_logic_logic_obj_id_uindex
-  unique (logic_obj_id, role_id)
+  position_id   varchar(3)   not null
+    primary key,
+  position_name varchar(255) null
 );
 
-create table user_in_logic
+create table position_in_logic
 (
-  logic_obj_id varchar(5)  not null,
-  user_id      varchar(32) not null,
-  constraint user_in_logic_logic_obj_id_uindex
-  unique (logic_obj_id, user_id)
+  logic_obj_id varchar(5) not null,
+  position_id  varchar(3) not null,
+  constraint role_in_logic_logic_obj_id_uindex
+  unique (logic_obj_id, position_id)
 );
 
 CREATE PROCEDURE getTableStructureData(IN tableName VARCHAR(255))
@@ -101,3 +100,18 @@ CREATE PROCEDURE getStructureObjectsByFilter(IN queryWhere VARCHAR(255), IN inSt
     DEALLOCATE PREPARE stmt;
     COMMIT;
   END;
+
+  create procedure getAllWorkplaces(IN tableName varchar(255), IN queryWhere varchar(255), IN inStart int(6),
+                                  IN inOffset  int(6))
+  BEGIN
+    START TRANSACTION;
+    SET @sql = CONCAT('SELECT SQL_CALC_FOUND_ROWS * FROM workplaces
+    JOIN positions AS pos ON workplaces.position_id = pos.position_id
+    JOIN structure_object AS struc ON workplaces.structure_id = struc.obj_id ',queryWhere,' LIMIT ',inStart,',',inOffset,';');
+    PREPARE stmt FROM @sql;
+    EXECUTE stmt;
+    DEALLOCATE PREPARE stmt;
+    COMMIT;
+  END;
+
+

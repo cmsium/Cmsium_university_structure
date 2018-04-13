@@ -1,5 +1,113 @@
 <?php
 
+function addWorkplace(){
+    checkAuth();
+    $validator = Validator::getInstance();
+    $data = $validator->validateAllByMask($_POST,'addWorkplaceMask');
+    if ($data === false){
+        throwException(DATA_FORMAT_ERROR);
+    }
+    $handler = new DataModel('workplaces');
+    $id = generateId($handler->id_info['CHARACTER_MAXIMUM_LENGTH'],$data['position_id'].$data['structure_id'],$handler->table_name);
+    if (!$handler->add($data,$id)){
+        throwException(CREATE_WORKPLACE_ERROR);
+    }
+}
+
+function showWorkplace(){
+    checkAuth();
+    $validator = Validator::getInstance();
+    $data = $validator->validateAllByMask($_GET,'showWorkplaceMask');
+    if ($data === false){
+        throwException(DATA_FORMAT_ERROR);
+    }
+    $handler = new WorkplacesHandler();
+    $result = $handler->read($data['workplace_id'],['fkeys'=>['position_id'=>'positions','structure_id'=>'structure_object']]);
+    echo json_encode($result);
+}
+
+function getWorkplaces(){
+    checkAuth();
+    $validator = Validator::getInstance();
+    $data = $validator->validateAllByMask($_GET,'getWorkplacesMask');
+    if ($data === false){
+        throwException(DATA_FORMAT_ERROR);
+    }
+    if (!isset($data['start'])){
+        $data['start'] = 0;
+    }
+    if (!isset($data['limit'])){
+        $data['limit'] = 100000;
+    }
+    $handler = new WorkplacesHandler();
+    $result = $handler->getAll($data);
+    $result['count'] = $handler->count;
+    echo json_encode($result);
+}
+
+function deleteWorkplace(){
+    checkAuth();
+    $validator = Validator::getInstance();
+    $data = $validator->validateAllByMask($_GET,'deleteWorkplaceMask');
+    if ($data === false){
+        throwException(DATA_FORMAT_ERROR);
+    }
+    $handler = new DataModel('workplaces');
+    if ($handler->delete($data['workplace_id']) === false){
+        throwException(DELETE_WORKPLACE_ERROR);
+    }
+}
+
+function addPosition() {
+    checkAuth();
+    $validator = Validator::getInstance();
+    $data = $validator->validateAllByMask($_POST, 'addPositionMask');
+    if ($data === false) {
+        throwException(DATA_FORMAT_ERROR);
+    }
+    $handler = new DataModel('positions');
+    $id = generateId($handler->id_info['CHARACTER_MAXIMUM_LENGTH'], $data['position_name'], $handler->table_name);
+    if (!$handler->add($data, $id)) {
+        throwException(CREATE_POSITION_ERROR);
+    }
+}
+
+function deletePosition(){
+    checkAuth();
+    $validator = Validator::getInstance();
+    $data = $validator->validateAllByMask($_GET,'deletePositionMask');
+    if ($data === false){
+        throwException(DATA_FORMAT_ERROR);
+    }
+    $handler = new DataModel('positions');
+    if (!$handler->delete($data['position_id'])){
+        throwException(DELETE_POSITION_ERROR);
+    }
+}
+
+function getPositions(){
+    checkAuth();
+    $validator = Validator::getInstance();
+    $data = $validator->validateAllByMask($_GET,'getPositionsMask');
+    if ($data === false){
+        throwException(DATA_FORMAT_ERROR);
+    }
+    $handler = new DataModel('positions');
+    $result = $handler->getAll(['start'=>0,'limit'=>10000]);
+    echo json_encode($result);
+}
+
+function showPosition(){
+    checkAuth();
+    $validator = Validator::getInstance();
+    $data = $validator->validateAllByMask($_GET,'showPositionMask');
+    if ($data === false){
+        throwException(DATA_FORMAT_ERROR);
+    }
+    $handler = new DataModel('positions');
+    $result = $handler->read($data['position_id']);
+    echo json_encode($result);
+}
 
 function addType(){
     checkAuth();
@@ -142,7 +250,7 @@ function getTypes(){
     }
     $type_handler = new DataModel($data['table'].'_types');
     unset($data['table']);
-    $types = $type_handler->getAll(['start'=>0,'offset'=>10000]);
+    $types = $type_handler->getAll(['start'=>0,'limit'=>10000]);
     if ($types){
         //TODO send enumerative array, not json
         echo json_encode($types);

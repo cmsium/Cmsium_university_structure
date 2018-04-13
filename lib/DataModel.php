@@ -83,7 +83,8 @@ class DataModel{
         $add_str='';
         if ($additional['fkeys']){
             foreach ($additional['fkeys'] as $fkey => $fvalue){
-                $add_str .= " JOIN $fvalue ON {$this->table_name}.$fkey = $fvalue.$fkey ";
+                $handler = new DataModel($fvalue);
+                $add_str .= " JOIN $fvalue ON {$this->table_name}.$fkey = $fvalue.{$handler->id_info['COLUMN_NAME']}";
             }
         }
         if ($additional['joins']){
@@ -109,10 +110,10 @@ class DataModel{
     }
 
     function getAll($data){
-        if (isset($data['start']) and isset($data['offset'])){
+        if (isset($data['start']) and isset($data['limit'])){
             $start = $data['start'];
-            $offset = $data['offset'];
-            unset($data['offset']);
+            $offset = $data['limit'];
+            unset($data['limit']);
             unset($data['start']);
         } else {
             $start=0;

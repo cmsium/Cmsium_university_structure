@@ -300,6 +300,34 @@ class DBConnection {
         }
     }
 
+    function generateId($table_name,$table_id_structure = null){
+        if ($table_id_structure){
+            $id = $table_id_structure;
+        } else {
+            $query = "call getTableStructureData('$table_name');";
+            $id = $this->performQueryFetch($query);
+        }
+        do {
+            switch($id['DATA_TYPE']){
+                case 'varchar':
+                    $generated_id = $this->randomString($id['CHARACTER_MAXIMUM_LENGTH']);
+                    break;
+            }
+            $query = "SELECT * FROM $table_name WHERE {$id['COLUMN_NAME']} = '$generated_id';";
+            $result = $this->performQueryFetch($query);
+        } while (!empty($result));
+        return $generated_id;
+    }
+
+
+    function randomString($length, $string = 'abcdef0123456789'){
+        $result='';
+        for($i=0;$i<$length;$i++){
+            $result .= $string[mt_rand(0,strlen($string) - 1)];
+        }
+        return $result;
+    }
+
     /**
      * Destroys an object and kills a connection
      */
