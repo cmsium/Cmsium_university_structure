@@ -1,5 +1,13 @@
 <?php
 
+
+function getTwigs(){
+    checkAuth();
+    $handler = new RelationsHandler();
+    echo json_encode($handler->getTwigs());
+
+}
+
 function addWorkplace(){
     checkAuth();
     $validator = Validator::getInstance();
@@ -8,12 +16,19 @@ function addWorkplace(){
         throwException(DATA_FORMAT_ERROR);
     }
     $handler = new DataModel('workplaces');
-    $id = generateId($handler->id_info['CHARACTER_MAXIMUM_LENGTH'],$data['position_id'].$data['structure_id'],$handler->table_name);
+    $id = generateId($handler->id_info['CHARACTER_MAXIMUM_LENGTH'],$data['position_id'],$handler->table_name);
+    $struc = $data['structure_node_id'];
+    unset($data['structure_node_id']);
     if (!$handler->add($data,$id)){
+        throwException(CREATE_WORKPLACE_ERROR);
+    }
+    $ref_handler = new RelationsHandler(1);
+    if (!$ref_handler->add(2,$id,$struc)){
         throwException(CREATE_WORKPLACE_ERROR);
     }
 }
 
+//TODO make it work
 function showWorkplace(){
     checkAuth();
     $validator = Validator::getInstance();
@@ -21,9 +36,11 @@ function showWorkplace(){
     if ($data === false){
         throwException(DATA_FORMAT_ERROR);
     }
-    $handler = new WorkplacesHandler();
-    $result = $handler->read($data['workplace_id'],['fkeys'=>['position_id'=>'positions','structure_id'=>'structure_object']]);
-    echo json_encode($result);
+    $rel_handler = new RelationsHandler();
+    $obj_data = $rel_handler->read($data['node_id'],false);
+    $obj_handler = new DataModel('workplaces');
+    $result = $obj_handler->read($obj_data['ent_id'],['fkeys'=>['position_id'=>'positions']]);
+    echo json_encode(array_merge($result,$obj_data));
 }
 
 function getWorkplaces(){
@@ -34,29 +51,31 @@ function getWorkplaces(){
         throwException(DATA_FORMAT_ERROR);
     }
     if (!isset($data['start'])){
-        $data['start'] = 0;
+        $start = 0;
+    } else {
+        $start =$data['start'];
     }
     if (!isset($data['limit'])){
-        $data['limit'] = 100000;
+        $limit = 100000;
+    } else {
+        $limit = $data['limit'];
     }
-    $handler = new WorkplacesHandler();
-    $result = $handler->getAll($data);
-    $result['count'] = $handler->count;
+    $obj_handler = new RelationsHandler(2);
+    $data['kind'] = 2;
+    $objects = $obj_handler->getNodesByFilter($data,$start,$limit);
+    $entity_handler = new DataModel('workplaces');
+    $result=[];
+    foreach ($objects as $object){
+        if (isset($object['node_id'])) {
+            $data = $entity_handler->read($object['ent_id'],['fkeys' => ['position_id' => 'positions']]);
+            $result[] = array_merge($object, $data);
+        }
+    }
+    $result['obj_count'] = $objects['obj_count'];
+    //TODO send enumerative array, not json
     echo json_encode($result);
 }
 
-function deleteWorkplace(){
-    checkAuth();
-    $validator = Validator::getInstance();
-    $data = $validator->validateAllByMask($_GET,'deleteWorkplaceMask');
-    if ($data === false){
-        throwException(DATA_FORMAT_ERROR);
-    }
-    $handler = new DataModel('workplaces');
-    if ($handler->delete($data['workplace_id']) === false){
-        throwException(DELETE_WORKPLACE_ERROR);
-    }
-}
 
 function addPosition() {
     checkAuth();
@@ -116,8 +135,7 @@ function addType(){
     if ($data === false){
         throwException(DATA_FORMAT_ERROR);
     }
-    $type_handler = new DataModel($data['table'].'_types');
-    unset($data['table']);
+    $type_handler = new DataModel('structure_types');
     $id = generateId($type_handler->id_info['CHARACTER_MAXIMUM_LENGTH'],$data['type_name'],$type_handler->table_name);
     if (!$type_handler->add($data,$id)) {
         throwException(CREATE_STRUCTURE_TYPE_ERROR);
@@ -131,8 +149,7 @@ function deleteType(){
     if ($data === false){
         throwException(DATA_FORMAT_ERROR);
     }
-    $type_handler = new DataModel($data['table'].'_types');
-    unset($data['table']);
+    $type_handler = new DataModel('structure_types');
     if (!$type_handler->delete($data['id'])) {
         throwException(DELETE_STRUCTURE_TYPE_ERROR);
     }
@@ -145,10 +162,16 @@ function addObject(){
     if ($data === false){
         throwException(DATA_FORMAT_ERROR);
     }
-    $obj_handler = new DataModel($data['table'].'_object');
+    $obj_handler = new DataModel('structure_object');
     $id = generateId($obj_handler->id_info['CHARACTER_MAXIMUM_LENGTH'],$data['type_name'],$obj_handler->table_name);
-    unset($data['table']);
+    $ref_tree_data = $data;
+    unset($data['parent_id']);
+    unset($data['twig']);
     if (!$obj_handler->add($data,$id)){
+        throwException(ADD_STRUCTURE_OBJECT_ERROR);
+    }
+    $ref_handler = new RelationsHandler($ref_tree_data['twig']);
+    if (!$ref_handler->add(1,$id,$ref_tree_data['parent_id'])){
         throwException(ADD_STRUCTURE_OBJECT_ERROR);
     }
 }
@@ -160,11 +183,10 @@ function updateObject(){
     if ($data === false){
         throwException(DATA_FORMAT_ERROR);
     }
-    $obj_handler = new DataModel($data['table'].'_object');
-    $id = $data['obj_id'];
-    unset($data['obj_id']);
-    unset($data['table']);
-    if ($obj_handler->update($id,$data) === false){
+    $id = $data['node_id'];
+    unset($data['node_id']);
+    $handler = new RelationsHandler();
+    if (!$handler->update($id,$data)){
         throwException(UPDATE_STRUCTURE_OBJECT_ERROR);
     }
 }
@@ -176,29 +198,12 @@ function deleteObject(){
     if ($data === false){
         throwException(DATA_FORMAT_ERROR);
     }
-    $obj_handler = new DataModel($data['table'].'_object');
-    if (!$obj_handler->delete($data['obj_id'])){
+    $ref_handler = new RelationsHandler();
+    if (!$ref_handler->delete($data['node_id'])){
         throwException(DELETE_STRUCTURE_OBJECT_ERROR);
     }
 }
 
-
-function getObject(){
-    checkAuth();
-    $validator = Validator::getInstance();
-    $data = $validator->validateAllByMask($_GET,'getStructureObjectMask');
-    if ($data === false){
-        throwException(DATA_FORMAT_ERROR);
-    }
-    $obj_handler = new DataModel($data['table'].'_object');
-    $obj = $obj_handler->read($data['obj_id'],['fkeys'=>['type_id'=>$data['table'].'_types']]);
-    if ($obj){
-        //TODO send enumerative array, not json
-        echo json_encode($obj);
-    } else {
-        throwException(GET_STRUCTURE_OBJECT_ERROR);
-    }
-}
 
 function getObjects(){
     checkAuth();
@@ -219,37 +224,31 @@ function getObjects(){
     } else {
         $limit = 1000000;
     }
-    if (isset($data['table'])){
-        $table = $data['table'];
-        unset($data['table']);
+    $obj_handler = new RelationsHandler($data['twig']);
+    $objects = $obj_handler->getNodesByFilter($data,$start,$limit);
+    $result=[];
+    foreach ($objects as $object){
+        if (isset($object['node_id'])) {
+            $entity_handler = new DataModel($object['source_table']);
+            switch ($object['source_table']) {
+                case 'structure_object':
+                    $data = $entity_handler->read($object['ent_id'], ['fkeys' => ['type_id' => 'structure_types']]);
+                    break;
+                case 'workplaces':
+                    $data = $entity_handler->read($object['ent_id'], ['fkeys' => ['position_id' => 'positions']]);
+                    break;
+            }
+            $result[] = array_merge($object, $data);
+        }
     }
-    switch ($table){
-        case 'structure':
-            $obj_handler = new StructureHandler();
-            $objects = $obj_handler->getStructureObjectsByFilter($data,$start,$limit);
-            break;
-        case 'logic':
-            $obj_handler = new LogicHandler();
-            $objects = $obj_handler->getLogicObjectsByFilter($data,$start,$limit);
-            break;
-        default:
-            $obj_handler = new StructureHandler();
-            $objects = $obj_handler->getStructureObjectsByFilter($data,$start,$limit);
-            break;
-    }
+    $result['obj_count'] = $objects['obj_count'];
     //TODO send enumerative array, not json
-    echo json_encode($objects);
+    echo json_encode($result);
 }
 
 function getTypes(){
     checkAuth();
-    $validator = Validator::getInstance();
-    $data = $validator->validateAllByMask($_GET,'getTypesMask');
-    if ($data === false){
-        throwException(DATA_FORMAT_ERROR);
-    }
-    $type_handler = new DataModel($data['table'].'_types');
-    unset($data['table']);
+    $type_handler = new DataModel('structure_types');
     $types = $type_handler->getAll(['start'=>0,'limit'=>10000]);
     if ($types){
         //TODO send enumerative array, not json
@@ -266,23 +265,24 @@ function showObject(){
     if ($data === false){
         throwException(DATA_FORMAT_ERROR);
     }
-    $obj_handler = new DataModel($data['table'].'_object');
-    if (!($result = $obj_handler->read($data['obj_id'],['fkeys'=>['type_id'=>$data['table'].'_types']]))){
+    $rel_handler = new RelationsHandler();
+    $obj_data = $rel_handler->read($data['node_id'],false);
+    $obj_handler = new DataModel('structure_object');
+    if (!($result = $obj_handler->read($obj_data['ent_id'],['fkeys'=>['type_id'=>'structure_types']]))){
         throwException(GET_STRUCTURE_OBJECT_ERROR);
     }
-    echo json_encode($result);
+    echo json_encode(array_merge($result,$obj_data));
 }
 
-function showObjectChildNodes(){
+function getCrossTwigNodes(){
     checkAuth();
     $validator = Validator::getInstance();
-    $data = $validator->validateAllByMask($_GET,'showObjectNodesMask');
+    $data = $validator->validateAllByMask($_GET,'showCrossTwigNodesMask');
     if ($data === false){
         throwException(DATA_FORMAT_ERROR);
     }
-    $obj_handler = new NPDataModel($data['table'].'_in_logic');
-    unset($data['table']);
-    $result = $obj_handler->read($data);
+    $obj_handler = new RelationsHandler();
+    $result = $obj_handler->getConnectedNodes($data['node_id']);
     echo json_encode($result);
 }
 
@@ -293,9 +293,8 @@ function addToStructure(){
     if ($data === false){
         throwException(DATA_FORMAT_ERROR);
     }
-    $handler = new NPDataModel($data['entity_type'].'_in_logic');
-    $column = $data['entity_type'].'_id';
-    if (!$handler->add([$column => $data['entity_id'],'logic_obj_id'=>$data['obj_id']])){
+    $handler = new RelationsHandler();
+    if (!$handler->connect($data['id_up'],$data['id_down'])){
         throwException(UPDATE_STRUCTURE_OBJECT_ERROR);
     }
 }

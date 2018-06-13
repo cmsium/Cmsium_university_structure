@@ -16,3 +16,4 @@ require_once ROOTDIR.'/lib/StructureHandler.php';
 require_once ROOTDIR.'/lib/LogicHandler.php';
 require_once ROOTDIR.'/lib/NPDataModel.php';
 require_once ROOTDIR.'/lib/WorkplacesHandler.php';
+require_once ROOTDIR.'/lib/RelationsHandler.php';

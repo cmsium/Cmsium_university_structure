@@ -46,7 +46,6 @@ function generateId($count,$data,$table=null){
             }
             $str_count = (string)$n;
             $id_str = substr_replace($id_str,$str_count,-(strlen($str_count)));
-            var_dump($id_str);
             $n++;
         } while ($exists_id);
     }

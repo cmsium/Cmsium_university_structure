@@ -32,15 +32,12 @@ class Masks{
           'password_repeat' => ['func' => 'AlphaNumeric',
                                 'props' => ['min' => 3, 'max' => 15],
                                 'required' => true]],
+
         'addStructureTypeMask'=>[
             'type_name' => [
                 'func' => 'CirrLatName',
                 'props' => ['min' => 1, 'max' => 255],
                 'required' => true],
-            'table' => [
-                'func' => 'ValueFromList',
-                'props' => ['list'=>['logic','structure']],
-                'required' => false],
         ],
 
         'deleteStructureTypeMask'=>[
@@ -48,10 +45,6 @@ class Masks{
                 'func' => 'CirrLatName',
                 'props' => ['min'=>1,'max' => 3],
                 'required' => true],
-            'table' => [
-                'func' => 'ValueFromList',
-                'props' => ['list'=>['logic','structure']],
-                'required' => false],
         ],
 
         'getStructureObjectMask'=>[
@@ -75,12 +68,16 @@ class Masks{
                 'props' => ['min' => 1, 'max' => 3],
                 'required' => false],
             'parent_id' => [
-                'func' => 'CirrLatName',
-                'props' => ['min' => 1,'max' => 5],
+                'func' => 'Md5Type',
+                'props' => [],
                 'required' => false],
-            'table' => [
-                'func' => 'ValueFromList',
-                'props' => ['list'=>['logic','structure']],
+            'twig' => [
+                'func' => 'StrNumbers',
+                'props' => ['min' => 1,'max' => 4],
+                'required' => false],
+            'kind' => [
+                'func' => 'StrNumbers',
+                'props' => ['min' => 1,'max' => 3],
                 'required' => false],
             'start' => [
                 'func' => 'StrNumbers',
@@ -105,27 +102,23 @@ class Masks{
                 'props' => ['min' => 1, 'max' => 3],
                 'required' => true],
             'parent_id' => [
-                'func' => 'CirrLatName',
-                'props' => ['min' => 1,'max' => 5],
+                'func' => 'Md5Type',
+                'props' => [],
                 'required' => true],
-            'table' => [
-                'func' => 'ValueFromList',
-                'props' => ['list'=>['logic','structure']],
+            'twig' => [
+                'func' => 'StrNumbers',
+                'props' => ['min' => 1,'max' => 4],
                 'required' => false],
         ],
 
         'addToStructureMask'=>[
-            'obj_id' => [
-                'func' => 'CirrLatName',
-                'props' => ['min' => 1, 'max' => 5],
+            'id_up' => [
+                'func' => 'Md5Type',
+                'props' => [],
                 'required' => true],
-            'entity_type' => [
-                'func' => 'ValueFromList',
-                'props' => ['list' => ['structure','position']],
-                'required' => true],
-            'entity_id' => [
-                'func' => 'CirrLatName',
-                'props' => ['min' => 1,'max' => 32],
+            'id_down' => [
+                'func' => 'Md5Type',
+                'props' => [],
                 'required' => true],
         ],
 
@@ -137,9 +130,9 @@ class Masks{
         ],
 
         'addWorkplaceMask'=>[
-            'structure_id' => [
-                'func' => 'CirrLatName',
-                'props' => ['min' => 1, 'max' => 5],
+            'structure_node_id' => [
+                'func' => 'Md5Type',
+                'props' => [],
                 'required' => true],
             'position_id' => [
                 'func' => 'CirrLatName',
@@ -148,9 +141,9 @@ class Masks{
         ],
 
         'getWorkplacesMask'=>[
-            'structure_id' => [
-                'func' => 'CirrLatName',
-                'props' => ['min' => 1, 'max' => 5],
+            'parent_id' => [
+                'func' => 'Md5Type',
+                'props' => [],
                 'required' => false],
             'position_id' => [
                 'func' => 'CirrLatName',
@@ -169,9 +162,9 @@ class Masks{
         ],
 
         'showWorkplaceMask'=>[
-            'workplace_id' => [
-                'func' => 'CirrLatName',
-                'props' => ['min' => 1, 'max' => 6],
+            'node_id' => [
+                'func' => 'Md5Type',
+                'props' => [],
                 'required' => true],
         ],
 
@@ -196,32 +189,24 @@ class Masks{
                 'required' => true],
         ],
 
-        'showObjectNodesMask'=>[
-            'logic_obj_id' => [
-                'func' => 'CirrLatName',
-                'props' => ['min' => 1, 'max' => 5],
-                'required' => true],
-            'table' => [
-                'func' => 'ValueFromList',
-                'props' => ['list'=>['position','structure']],
+        'showCrossTwigNodesMask'=>[
+            'node_id' => [
+                'func' => 'Md5Type',
+                'props' => [],
                 'required' => false],
         ],
 
         'showObjectMask'=>[
-            'obj_id' => [
-                'func' => 'CirrLatName',
-                'props' => ['min' => 1, 'max' => 5],
+            'node_id' => [
+                'func' => 'Md5Type',
+                'props' => [],
                 'required' => true],
-            'table' => [
-                'func' => 'ValueFromList',
-                'props' => ['list'=>['logic','structure']],
-                'required' => false],
         ],
 
         'updateStructureObjectMask'=>[
-            'obj_id' => [
-                'func' => 'CirrLatName',
-                'props' => ['min' => 1,'max' => 5],
+            'node_id' => [
+                'func' => 'Md5Type',
+                'props' => [],
                 'required' => true],
             'obj_name' => [
                 'func' => 'CirrLatName',
@@ -232,32 +217,18 @@ class Masks{
                 'props' => ['min' => 1, 'max' => 3],
                 'required' => false],
             'parent_id' => [
-                'func' => 'CirrLatName',
-                'props' => ['min' => 1,'max' => 5],
-                'required' => false],
-            'table' => [
-                'func' => 'ValueFromList',
-                'props' => ['list'=>['logic','structure']],
+                'func' => 'Md5Type',
+                'props' => [],
                 'required' => false],
         ],
 
         'deleteStructureObjectMask'=>[
-            'obj_id' => [
-                'func' => 'CirrLatName',
-                'props' => ['min' => 1,'max' => 5],
+            'node_id' => [
+                'func' => 'Md5Type',
+                'props' => [],
                 'required' => true],
-            'table' => [
-                'func' => 'ValueFromList',
-                'props' => ['list'=>['logic','structure']],
-                'required' => false],
         ],
 
-     'getTypesMask'=>[
-         'table' => [
-             'func' => 'ValueFromList',
-             'props' => ['list'=>['logic','structure']],
-             'required' => true],
-         ],
 
     'registMask' => [
         'username' => ['func' => 'CirrLatName',

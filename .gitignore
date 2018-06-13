@@ -2,3 +2,4 @@
 servers/*
 support/refreshServerStatus.sh
 support/checkFilesConformity.sh
+/nbproject/private/
