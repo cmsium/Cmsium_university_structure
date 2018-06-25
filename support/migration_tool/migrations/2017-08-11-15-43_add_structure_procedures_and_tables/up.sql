@@ -1,9 +1,8 @@
 create table structure_object
 (
-  obj_id varchar(5) not null
-    primary key,
+  obj_id varchar(5) not null primary key,
   obj_name varchar(255) not null,
-  type_id VARCHAR(3) not null,
+  type_id VARCHAR(3) not null
 );
 
 create table structure_types
