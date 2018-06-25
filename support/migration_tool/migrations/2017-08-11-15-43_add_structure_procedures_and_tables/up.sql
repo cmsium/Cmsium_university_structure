@@ -4,7 +4,6 @@ create table structure_object
     primary key,
   obj_name varchar(255) not null,
   type_id VARCHAR(3) not null,
-  parent_id varchar(5) not null
 );
 
 create table structure_types
@@ -14,28 +13,18 @@ create table structure_types
 	type_name varchar(255) not null
 );
 
-CREATE TABLE logic_object
+create table workplaces
 (
-  obj_id    VARCHAR(5)   NOT NULL
-    PRIMARY KEY,
-  obj_name  VARCHAR(255) NOT NULL,
-  type_id   VARCHAR(3)       NOT NULL,
-  parent_id VARCHAR(5)   NOT NULL
+  workplace_id varchar(6) not null
+    primary key,
+  position_id  varchar(3) null
 );
 
-CREATE TABLE logic_types
+create table twigs
 (
-  type_id   VARCHAR(3)
-    PRIMARY KEY,
-  type_name VARCHAR(255) NOT NULL
-);
-
-create table structure_in_logic
-(
-  logic_obj_id varchar(5) not null,
-  structure_id varchar(5) not null,
-  constraint structure_in_logic_logic_obj_id_uindex
-  unique (logic_obj_id, structure_id)
+  twig_id   int(4)       not null
+    primary key,
+  twig_name varchar(255) null
 );
 
 create table positions
@@ -45,13 +34,67 @@ create table positions
   position_name varchar(255) null
 );
 
-create table position_in_logic
+create table relations_tree
 (
-  logic_obj_id varchar(5) not null,
-  position_id  varchar(3) not null,
-  constraint role_in_logic_logic_obj_id_uindex
-  unique (logic_obj_id, position_id)
+  node_id varchar(32)   not null
+    primary key,
+  twig    int(4)        null,
+  kind    int(3)        null,
+  ent_id  varbinary(32) null
 );
+
+create table cross_twig_relations
+(
+  rel_id  varchar(32) not null
+    primary key,
+  id_up   varchar(32) null,
+  id_down varchar(32) null,
+  constraint cross_twig_relations_id_up_uindex
+  unique (id_up, id_down)
+);
+
+create table entity_kinds
+(
+  kind_id      int(3)       not null
+    primary key,
+  kind_name    varchar(255) null,
+  source_table varchar(255) null
+);
+
+create procedure readFromRelations(IN idNode varchar(32))
+  BEGIN
+    select * from relations_tree as tree
+    JOIN twigs ON tree.twig = twigs.twig_id
+    JOIN entity_kinds as kinds ON tree.kind = kinds.kind_id
+    WHERE  tree.node_id = idNode;
+  END;
+
+
+create procedure getTwigs()
+  BEGIN
+    SELECT * FROM twigs;
+  END;
+
+create procedure getConnectedNodes(IN idNode varchar(32))
+  BEGIN
+    SELECT * FROM cross_twig_relations WHERE id_up = idNode OR id_down = idNode;
+  END;
+
+create procedure detachNode(IN idNode varchar(32))
+  BEGIN
+    DELETE FROM cross_twig_relations WHERE id_up = idNode OR id_down = idNode;
+  END;
+
+create procedure connectNodes(IN idRel varchar(32), IN idUp varchar(32), IN idDown varchar(32))
+  BEGIN
+    INSERT INTO cross_twig_relations (rel_id, id_up, id_down) VALUES (idRel, idUp, idDown);
+  END;
+
+create procedure addRelEntity(IN idNode varchar(32), IN twigId int(4), IN kindId int(3), IN entId varbinary(32))
+  BEGIN
+    INSERT INTO relations_tree (node_id, twig, kind, ent_id) values (idNode, twigId, kindId, entId);
+  END;
+
 
 CREATE PROCEDURE getTableStructureData(IN tableName VARCHAR(255))
   BEGIN
@@ -79,8 +122,8 @@ CREATE PROCEDURE getStructureObjectsByFilter(IN queryWhere VARCHAR(255), IN inSt
     COMMIT;
   END;
 
-  CREATE PROCEDURE addDataToEntity(IN tableName       VARCHAR(255), IN insertNamesStr VARCHAR(255),
-                                 IN insertValuesStr VARCHAR(255))
+create procedure addDataToEntity(IN tableName       varchar(255), IN insertNamesStr varchar(255),
+                                 IN insertValuesStr varchar(255))
   BEGIN
     START TRANSACTION;
     SET @sql = CONCAT('INSERT INTO ',tableName,' (',insertNamesStr,') VALUES (',insertValuesStr,');');
